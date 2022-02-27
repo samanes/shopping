@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  app:
+    image: 'shopping:latest'
+    build:
+      context: .
+    container_name: shopping-app
+    ports:
+      - "8199:8199"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shopping_cart
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  db:
+    image: 'postgres:13.1-alpine'
+    ports:
+      - "5432:5432"
+    container_name: shopping-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=shopping_cart
+      - PGDATA=/data/postgres
+    volumes:
+      - /data/postgres
