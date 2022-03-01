@@ -72,4 +72,33 @@
             <column name="last_modified_date" type="datetime" />
         </createTable>
     </changeSet>
+
+    <changeSet author="saman_e" id="20220301113000-4">
+        <createTable tableName="product">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+            </column>
+            <column name="created_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="datetime" />
+        </createTable>
+    </changeSet>
+
+    <changeSet author="saman_e" id="20220301113000-5">
+        <dropColumn tableName="shopping_item" columnName="name" />
+        <dropColumn tableName="shopping_item" columnName="description" />
+        <dropColumn tableName="shopping_item" columnName="product_code" />
+        <addColumn tableName="shopping_item">
+            <column name="product_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="FK_shoppingItem_product" references="product(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

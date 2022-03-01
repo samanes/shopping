@@ -1,36 +1,46 @@
 package io.jur.shopping.service;
 
+import io.jur.shopping.domain.ShoppingItem;
 import io.jur.shopping.domain.ShoppingList;
 import io.jur.shopping.repository.ShoppingListRepository;
-import io.jur.shopping.service.dto.ShoppingItemDto;
+import io.jur.shopping.repository.UserRepository;
+import io.jur.shopping.service.dto.ShoppingItemInput;
 import io.jur.shopping.service.dto.ShoppingListDto;
+import io.jur.shopping.service.mapper.InputShoppingItemMapper;
 import io.jur.shopping.service.mapper.ShoppingListMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ShoppingListService {
 
     private final ShoppingListRepository shoppingListRepository;
+    private final UserRepository userRepository;
     private final ShoppingListMapper shoppingListMapper;
+    private final InputShoppingItemMapper shoppingItemMapper;
 
     public ShoppingListDto getShoppingListByUser(Long userId) {
         ShoppingList shoppingList = shoppingListRepository.findTopByUserIdAndActiveTrue(userId);
-        ShoppingListDto shoppingListDto = shoppingListMapper.toShoppingListDto(shoppingList);
-        calculateTotal(shoppingListDto);
+        ShoppingListDto shoppingListDto = shoppingListMapper.toDto(shoppingList);
         return shoppingListDto;
     }
 
-    private void calculateTotal(ShoppingListDto shoppingListDto) {
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        for (ShoppingItemDto shoppingItem : shoppingListDto.getShoppingItems()) {
-            BigDecimal subTotal = shoppingItem.getPrice().multiply(BigDecimal.valueOf(shoppingItem.getQuantity()));
-            shoppingItem.setSubTotal(subTotal);
-            totalPrice = totalPrice.add(subTotal);
+    @Transactional
+    public void addShoppingItem(Long userId, ShoppingItemInput shoppingItemInput) {
+        ShoppingList shoppingList = fetchShoppingList(userId);
+        ShoppingItem shoppingItem = shoppingItemMapper.toEntity(shoppingItemInput);
+        shoppingList.addShoppingItem(shoppingItem);
+        shoppingListRepository.save(shoppingList);
+    }
+
+    private ShoppingList fetchShoppingList(Long userId) {
+        ShoppingList shoppingList = shoppingListRepository.findTopByUserIdAndActiveTrue(userId);
+        if (shoppingList == null) {
+            shoppingList = new ShoppingList();
+            shoppingList.setUser(userRepository.getById(userId));
         }
-        shoppingListDto.setTotal(totalPrice);
+        return shoppingList;
     }
 }

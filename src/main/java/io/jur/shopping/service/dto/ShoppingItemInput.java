@@ -5,10 +5,8 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class ShoppingItemDto {
-    private String name;
-    private String description;
+public class ShoppingItemInput {
     private BigDecimal price;
     private Integer quantity;
-    private BigDecimal subTotal;
+    private Long productId;
 }

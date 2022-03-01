@@ -4,8 +4,6 @@ import io.jur.shopping.domain.ShoppingList;
 import io.jur.shopping.service.dto.ShoppingListDto;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
-public interface ShoppingListMapper {
-
-    ShoppingListDto toShoppingListDto(ShoppingList shoppingList);
+@Mapper(componentModel = "spring", uses = ShoppingItemMapper.class)
+public interface ShoppingListMapper extends BaseEDMapper<ShoppingList, ShoppingListDto> {
 }

@@ -1,11 +1,15 @@
 package io.jur.shopping.service;
 
 import io.jur.shopping.ShoppingListTestData;
+import io.jur.shopping.domain.Product;
 import io.jur.shopping.domain.ShoppingItem;
 import io.jur.shopping.domain.ShoppingList;
 import io.jur.shopping.repository.ShoppingListRepository;
+import io.jur.shopping.service.dto.ShoppingItemInput;
 import io.jur.shopping.service.dto.ShoppingListDto;
+import io.jur.shopping.service.mapper.InputShoppingItemMapper;
 import io.jur.shopping.service.mapper.ShoppingListMapper;
+import liquibase.pro.packaged.B;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,13 +17,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ShoppingListServiceTest {
@@ -27,7 +31,10 @@ public class ShoppingListServiceTest {
     private ShoppingListRepository repository;
 
     @Mock
-    private ShoppingListMapper mapper;
+    private ShoppingListMapper shoppingListMapper;
+
+    @Mock
+    private InputShoppingItemMapper shoppingItemMapper;
 
     @InjectMocks
     private ShoppingListService shoppingListService;
@@ -36,7 +43,7 @@ public class ShoppingListServiceTest {
     public void getShoppingList() {
         when(repository.findTopByUserIdAndActiveTrue(anyLong()))
                 .thenReturn(getTestShoppingListData());
-        when(mapper.toShoppingListDto(any()))
+        when(shoppingListMapper.toDto(any()))
                 .thenReturn(ShoppingListTestData.getTestShoppingListData());
         ShoppingListDto shoppingListByUser = shoppingListService.getShoppingListByUser(1L);
         assertThat(shoppingListByUser.getShoppingItems())
@@ -46,23 +53,54 @@ public class ShoppingListServiceTest {
         assertEquals(BigDecimal.valueOf(50), shoppingListByUser.getTotal());
     }
 
-    public ShoppingList getTestShoppingListData() {
+    @Test
+    public void addShoppingItem_test() {
+        when(repository.findTopByUserIdAndActiveTrue(anyLong()))
+                .thenReturn(getTestShoppingListData());
+        when(shoppingItemMapper.toEntity(any())).thenReturn(createShoppingItem());
+        when(repository.save(any(ShoppingList.class))).thenReturn(getTestShoppingListData());
+
+        shoppingListService.addShoppingItem(1L, createShoppingItemInput());
+
+        verify(repository, times(1)).save(any());
+    }
+
+    private ShoppingItem createShoppingItem() {
+        ShoppingItem shoppingItem = new ShoppingItem();
+        shoppingItem.setId(1L);
+        shoppingItem.setPrice(BigDecimal.valueOf(10));
+        shoppingItem.setQuantity(2);
+        Product product = new Product();
+        product.setId(1L);
+        shoppingItem.setProduct(product);
+        return shoppingItem;
+    }
+
+    private ShoppingItemInput createShoppingItemInput() {
+        ShoppingItemInput shoppingItemInput = new ShoppingItemInput();
+        shoppingItemInput.setProductId(1L);
+        shoppingItemInput.setQuantity(2);
+        shoppingItemInput.setPrice(BigDecimal.valueOf(10));
+        return shoppingItemInput;
+    }
+
+    private ShoppingList getTestShoppingListData() {
         ShoppingList shoppingList = new ShoppingList();
-        ShoppingItem shoppingItem1 = createShoppingItem("item1", "item1 description", 20, 1, 20);
-        ShoppingItem shoppingItem2 = createShoppingItem("item2", "item2 description", 15, 2, 30);
-        shoppingList.setShoppingItems(Arrays.asList(shoppingItem1, shoppingItem2));
+        ShoppingItem shoppingItem1 = createShoppingItemInput(20, 1);
+        ShoppingItem shoppingItem2 = createShoppingItemInput(15, 2);
+        shoppingList.setShoppingItems(new ArrayList<>(Arrays.asList(shoppingItem1, shoppingItem2)));
         shoppingList.setId(1L);
         shoppingList.setTotal(BigDecimal.valueOf(50));
         return shoppingList;
     }
 
-    private ShoppingItem createShoppingItem(String name, String description, int price, int quantity, int subTotal) {
+    private ShoppingItem createShoppingItemInput(int price, int quantity) {
         ShoppingItem shoppingItem = new ShoppingItem();
-        shoppingItem.setName(name);
         shoppingItem.setPrice(BigDecimal.valueOf(price));
-        shoppingItem.setSubTotal(BigDecimal.valueOf(subTotal));
+        Product product = new Product();
+        product.setId(1L);
+        shoppingItem.setProduct(product);
         shoppingItem.setQuantity(quantity);
-        shoppingItem.setDescription(description);
         return shoppingItem;
     }
 
