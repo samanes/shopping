@@ -37,7 +37,7 @@ public class ShoppingListControllerTest {
                 .andExpect(status().is(200))
                 .andExpect(status().isOk())
                 .andReturn();
-        JSONAssert.assertEquals("{\"shoppingItems\":[{\"name\":\"item1\",\"description\":\"item1 description\",\"productCode\":null,\"price\":20,\"quantity\":1,\"subTotal\":20},{\"name\":\"item2\",\"description\":\"item2 description\",\"productCode\":null,\"price\":15,\"quantity\":2,\"subTotal\":30}],\"total\":50}"
+        JSONAssert.assertEquals("{\"shoppingItems\":[{\"id\":1,\"name\":\"item1\",\"description\":\"item1 description\",\"price\":20,\"quantity\":1,\"subTotal\":20},{\"id\":2,\"name\":\"item2\",\"description\":\"item2 description\",\"price\":15,\"quantity\":2,\"subTotal\":30}],\"total\":50}"
                 , result.getResponse().getContentAsString(), false);
     }
 
