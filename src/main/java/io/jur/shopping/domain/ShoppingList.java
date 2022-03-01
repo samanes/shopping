@@ -37,4 +37,8 @@ public class ShoppingList extends BaseEntity {
                 .map(item -> item.getSubTotal())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    public void removeShoppingItem(Long itemId) {
+        shoppingItems.removeIf(shoppingItem -> shoppingItem.getId().equals(itemId));
+    }
 }

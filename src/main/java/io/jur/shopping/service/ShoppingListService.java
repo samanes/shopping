@@ -2,6 +2,7 @@ package io.jur.shopping.service;
 
 import io.jur.shopping.domain.ShoppingItem;
 import io.jur.shopping.domain.ShoppingList;
+import io.jur.shopping.repository.ShoppingItemRepository;
 import io.jur.shopping.repository.ShoppingListRepository;
 import io.jur.shopping.repository.UserRepository;
 import io.jur.shopping.service.dto.ShoppingItemInput;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShoppingListService {
 
     private final ShoppingListRepository shoppingListRepository;
+    private final ShoppingItemRepository shoppingItemRepository;
     private final UserRepository userRepository;
     private final ShoppingListMapper shoppingListMapper;
     private final InputShoppingItemMapper shoppingItemMapper;
@@ -32,6 +34,14 @@ public class ShoppingListService {
         ShoppingList shoppingList = fetchShoppingList(userId);
         ShoppingItem shoppingItem = shoppingItemMapper.toEntity(shoppingItemInput);
         shoppingList.addShoppingItem(shoppingItem);
+        shoppingListRepository.save(shoppingList);
+    }
+
+    @Transactional
+    public void removeShoppingItem(Long userId, Long itemId) {
+        ShoppingList shoppingList = shoppingListRepository.findTopByUserIdAndActiveTrue(userId);
+        shoppingList.removeShoppingItem(itemId);
+        shoppingItemRepository.deleteById(itemId);
         shoppingListRepository.save(shoppingList);
     }
 

@@ -1,7 +1,6 @@
 package io.jur.shopping.controller;
 
 import io.jur.shopping.service.ShoppingListService;
-import io.jur.shopping.service.dto.ShoppingItemDto;
 import io.jur.shopping.service.dto.ShoppingItemInput;
 import io.jur.shopping.service.dto.ShoppingListDto;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,12 @@ public class ShoppingListController {
     @PostMapping
     public ResponseEntity<Void> addItem(@PathVariable Long userId, @RequestBody ShoppingItemInput shoppingItem) {
         shoppingListService.addShoppingItem(userId, shoppingItem);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{itemId}")
+    public ResponseEntity<Void> removeItem(@PathVariable Long userId, @PathVariable Long itemId) {
+        shoppingListService.removeShoppingItem(userId, itemId);
         return ResponseEntity.ok().build();
     }
 }
