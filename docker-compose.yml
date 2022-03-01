@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   app:
-    image: 'shopping:latest'
+    image: 'shopping:0.0.2-SNAPSHOT'
     build:
       context: .
     container_name: shopping-app

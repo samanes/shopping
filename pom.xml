@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.jur</groupId>
     <artifactId>shopping</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>shopping</name>
     <description>Assignment task for Jur company</description>
     <properties>
@@ -95,6 +95,14 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liquibase.version}</version>
+                <configuration>
+                    <propertyFile>src/main/resources/application.properties</propertyFile>
                 </configuration>
             </plugin>
             <plugin>
